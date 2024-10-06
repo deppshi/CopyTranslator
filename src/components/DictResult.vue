@@ -4,17 +4,18 @@
     class="dict"
     v-bind:style="dictStyle"
     v-if="dictResult && dictResult.valid"
+    @contextmenu="openMenu('contrastContext')"
   >
     <p class="dictSrc noMargin">[{{ dictResult.words }}]</p>
     <div v-if="dictResult.phonetics.length != 0">
       <p class="notation noMargin">Phonetic:</p>
-      <p
+      <span
         class="dictPhonetic noMargin"
         v-for="item in dictResult.phonetics"
         :key="item.type + item.value"
       >
-        [{{ item.type }}]{{ item.value }}
-      </p>
+        [{{ item.type }}]{{ item.value }} &nbsp;
+      </span>
     </div>
     <div v-if="dictResult.explains.length > 0">
       <p class="notation noMargin">Basic Explains:</p>
@@ -31,14 +32,15 @@
 
 <script lang="ts">
 import BaseView from "./BaseView.vue";
-import { Mixins, Component, Vue } from "vue-property-decorator";
+import { Mixins, Component } from "vue-property-decorator";
 
 @Component
 export default class DictResult extends Mixins(BaseView) {
   get dictStyle() {
     return {
-      fontSize: this.size.toString() + "px",
+      fontSize: this.dictSize.toString() + "px",
       height: "100%;",
+      color: this.fontColor,
     };
   }
 }
@@ -50,6 +52,7 @@ export default class DictResult extends Mixins(BaseView) {
   margin-top: 0%;
   padding-top: 0%;
   top: 0%;
+  height: 100%;
 }
 
 .notation {

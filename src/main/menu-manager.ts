@@ -15,7 +15,6 @@ import bus from "../common/event-bus";
 import { ActionManager } from "@/common/action";
 import { CommonController } from "@/common/controller";
 import { ConfigParser } from "@/common/configParser";
-import eventBus from "../common/event-bus";
 
 type CallBack = (
   menuItem?: MenuItem,
@@ -76,8 +75,17 @@ export class MenuManager {
     if (menuItem.submenu) {
       const value = this.config.get(menuItem.id as Identifier);
       for (const subMenuItem of menuItem.submenu) {
-        const { identifier, param } = decompose(subMenuItem.id);
-        subMenuItem.checked = param == value;
+        if (subMenuItem.type == "checkbox") {
+          const { identifier, param } = decompose(subMenuItem.id);
+          if (action.actionType == "multi_select") {
+            subMenuItem.checked = (<Array<string>>value).includes(param);
+          } else {
+            subMenuItem.checked = param == value;
+          }
+        } else if (subMenuItem.type == "normal") {
+        } else {
+          throw "invalid submenu item type";
+        }
         subMenuItem.click = this.getCallback(subMenuItem.id);
       }
     }
@@ -106,7 +114,7 @@ export class MenuManager {
       (this.tray as any).popUpContextMenu(this.getMenu("tray"));
     });
     this.tray.on("click", (event) => {
-      eventBus.at("dispatch", "showWindow");
+      bus.at("dispatch", "showWindow");
     });
   }
 }

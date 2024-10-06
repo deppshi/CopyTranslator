@@ -4,6 +4,7 @@ import { clipboard } from "./clipboard";
 import eventBus from "../common/event-bus";
 import config from "../common/configuration";
 import iohook from "iohook";
+import { isValidWindow } from "./focus-handler";
 
 class EventListener {
   drag = false;
@@ -23,10 +24,6 @@ class EventListener {
   lastCopy = Date.now();
 
   bind() {
-    eventBus.gonce("firstLoad", (event: any, args: any) => {
-      eventBus.at("dispatch", "checkUpdate");
-    });
-
     if (os.platform() !== "linux") {
       this.bindHooks();
     } else {
@@ -98,17 +95,22 @@ class EventListener {
     ioHook.on("mouseup", (event: MouseEvent) => {
       //模拟点按复制
       if (
-        config.get("dragCopy") &&
-        config.get("listenClipboard") &&
         !this.copied &&
         Date.now() - this.lastDown > 100 &&
         Math.abs(this.newX - this.lastX) + Math.abs(this.newY - this.lastY) > 10
       ) {
-        this.simulateCopy();
-        if (event.ctrlKey) {
-          eventBus.at("dispatch", "incrementSelect");
-        }
-        this.copied = true;
+        isValidWindow("dragCopy").then((valid) => {
+          const condition =
+            valid && config.get("dragCopy") && config.get("listenClipboard");
+          if (!condition) {
+            return;
+          }
+          this.simulateCopy();
+          if (event.ctrlKey) {
+            eventBus.at("dispatch", "incrementCounter", 1);
+          }
+          this.copied = true;
+        });
       }
     });
 
@@ -130,14 +132,20 @@ class EventListener {
       const newY = event.y;
       const newX = event.x;
       if (
-        config.get("listenClipboard") &&
-        config.get("dragCopy") &&
-        config.get("doubleClickCopy") &&
         now - this.lastDown < 500 &&
         Math.abs(newX - this.lastClickX) < 4 &&
         Math.abs(newY - this.lastClickY) < 4
       ) {
-        this.simulateCopy();
+        isValidWindow("dragCopy").then((valid) => {
+          let condition =
+            valid &&
+            config.get("listenClipboard") &&
+            config.get("dragCopy") &&
+            config.get("doubleClickCopy");
+          if (condition) {
+            this.simulateCopy();
+          }
+        });
       }
       this.lastClick = now;
       this.lastClickX = event.x;

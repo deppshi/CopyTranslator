@@ -2,28 +2,27 @@ import { homedir, type as osTypeFunc } from "os";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { nativeImage } from "electron";
-const osType = osTypeFunc() as string;
+const osType = osTypeFunc() as "Windows_NT" | "Darwin" | "Linux";
 
-const osSpec: {
-  [key: string]: { iconName: string; trayName: string };
-} = {
+export const osSpec = {
   Windows_NT: {
     iconName: "icon.ico",
     trayName: "icon.ico",
+    name: "windows",
   },
   Darwin: {
     iconName: "icon.png",
     trayName: "tray@2x.png",
+    name: "mac",
   },
   Linux: {
     iconName: "icon.png",
     trayName: "tray@2x.png",
+    name: "linux",
   },
-};
+}[osType];
 
-const currentSpec = osSpec[osType];
-
-const trayName = currentSpec.trayName;
+const trayName = osSpec.trayName;
 
 function mkdir(path: string) {
   if (existsSync(path)) {
@@ -44,7 +43,7 @@ interface SharedConfig {
 
 interface DiffConfig {
   systemLocaleDir: string;
-
+  externalResource: string;
   iconPath: string;
   trayIconPath: string;
   styleTemplate: string;
@@ -65,15 +64,17 @@ const sharedConfig: SharedConfig = {
 const diffConfig: DiffConfig =
   process.env.NODE_ENV == "production"
     ? {
+        externalResource: join(process.resourcesPath, "external_resource"),
         systemLocaleDir: join(process.resourcesPath, "locales"),
-        iconPath: join(process.resourcesPath, currentSpec.iconName),
+        iconPath: join(process.resourcesPath, osSpec.iconName),
         trayIconPath: join(process.resourcesPath, trayName),
         styleTemplate: join(process.resourcesPath, "styles.css"),
         publicUrl: `file://${__dirname}`,
       }
     : {
+        externalResource: join(process.cwd(), "external_resource"),
         systemLocaleDir: join(process.cwd(), "dist_locales"),
-        iconPath: join(process.cwd(), currentSpec.iconName),
+        iconPath: join(process.cwd(), osSpec.iconName),
         trayIconPath: join(process.cwd(), trayName),
         styleTemplate: join(process.cwd(), "src", "styles.css"),
         publicUrl: <string>process.env.WEBPACK_DEV_SERVER_URL,
@@ -85,4 +86,4 @@ mkdir(env.configDir);
 mkdir(env.userLocaleDir);
 const icon = nativeImage.createFromPath(env.iconPath);
 
-export { env, icon };
+export { env, icon, osType };

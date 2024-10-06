@@ -1,11 +1,15 @@
-const robot = require("robotjs");
+import { osType } from "@/common/env";
+const { keyboard, Key } = require("@nut-tree/nut-js");
+const modifier = osType == "Darwin" ? Key.LeftSuper : Key.LeftControl;
 
-function simulateCopy() {
-  robot.keyTap("C", "control");
+async function simulateCopy() {
+  await keyboard.pressKey(modifier, Key.C);
+  await keyboard.releaseKey(modifier, Key.C);
 }
 
-function simulatePaste() {
-  robot.keyTap("V", "control");
+async function simulatePaste() {
+  await keyboard.pressKey(modifier, Key.V);
+  await keyboard.releaseKey(modifier, Key.V);
 }
 
 export default {

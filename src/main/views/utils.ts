@@ -13,20 +13,22 @@ export function insertStyles(window: BrowserWindow) {
 export function loadRoute(
   window: BrowserWindow,
   routeName: RouteActionType,
-  main: boolean = false
+  main: boolean,
+  queryString: string
 ) {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    const url = env.publicUrl + `/#/${routeName}`;
+    const url = env.publicUrl + `/#/${routeName}${queryString}`;
     console.log(url);
     window.loadURL(url);
+
     if (!process.env.IS_TEST && main) window.webContents.openDevTools();
   } else {
     // Load the index.html when not in development
     if (main) {
       createProtocol("app");
     }
-    const url = `${env.publicUrl}/index.html#${routeName}`;
+    const url = `${env.publicUrl}/index.html#${routeName}${queryString}`;
     window.loadURL(url);
   }
 }
@@ -47,28 +49,6 @@ export const defaultConfig = {
   icon: icon,
   webPreferences: {
     nodeIntegration: true,
+    webSecurity: false,
   },
 };
-
-const windows = new Map<RouteActionType, BrowserWindow>();
-
-export function createWindow(
-  routeName: RouteActionType,
-  param: MinimalParam,
-  main: boolean = false
-): BrowserWindow {
-  const config = {
-    ...defaultConfig,
-    ...param,
-  };
-  const window = new BrowserWindow(config);
-  if (!config.show) {
-    window.webContents.once("did-finish-load", () => {
-      window.show();
-    });
-  }
-  loadRoute(window, routeName, false);
-  insertStyles(window);
-  windows.set(routeName, window);
-  return window;
-}

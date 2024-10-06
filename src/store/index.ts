@@ -5,10 +5,7 @@ import { Identifier } from "./plugins/types";
 import { updateViewPlugin, observePlugin, initState } from "./plugins";
 export * from "./plugins";
 import { registerLocale } from "./plugins/l10n";
-import {
-  emptySharedResult,
-  emptySharedDiff,
-} from "@/common/translate/constants";
+import { emptySharedResult } from "@/common/translate/types";
 import { emptyDictResult } from "@/common/dictionary/types";
 
 Vue.use(Vuex);
@@ -21,39 +18,34 @@ const plugins = [
   updateViewPlugin,
 ];
 
+// renderer在config里存放多层的对象，可能会出现丢失的情况，尽量不要这样子做，应该像Languages那样
 const store = new Vuex.Store({
   state: {
-    languages: [],
-    color: "white",
+    status: "None",
     sharedResult: emptySharedResult(),
-    sharedDiff: emptySharedDiff(),
     dictResult: emptyDictResult(),
     config: {},
+    languages: { sources: [], targets: [] },
+    resultBuffer: {},
   },
   mutations: {
     setShared(state, sharedResult) {
       state.sharedResult = sharedResult;
     },
-    clearShared(state) {
-      state.sharedResult = emptySharedResult();
-    },
-    setDiff(state, sharedDiff) {
-      state.sharedDiff = sharedDiff;
-    },
-    clearDiff(state) {
-      state.sharedDiff = emptySharedDiff();
-    },
     setDictResult(state, dictResult) {
       state.dictResult = dictResult;
     },
-    setColor(state, color) {
-      state.color = color;
+    setStatus(state, status) {
+      state.status = status;
+    },
+    setLanguages(state, languages) {
+      Vue.set(state, "languages", languages);
+    },
+    setResultBuffer(state, resultBuffer) {
+      Vue.set(state, "resultBuffer", resultBuffer);
     },
     setConfig(state, config) {
       Vue.set(state, "config", config);
-    },
-    setLanguages(state: any, languages: any) {
-      Vue.set(state, "languages", languages);
     },
     updateConfig(state, config) {
       for (const key of Object.keys(config)) {
@@ -65,29 +57,23 @@ const store = new Vuex.Store({
     setShared(context, sharedResult) {
       context.commit("setShared", sharedResult);
     },
-    setDiff(context, sharedDiff) {
-      context.commit("setDiff", sharedDiff);
-    },
     setDictResult(context, dictResult) {
       context.commit("setDictResult", dictResult);
     },
-    setColor(context, color) {
-      context.commit("setColor", color);
+    setStatus(context, status) {
+      context.commit("setStatus", status);
     },
-    setLanguages(context: any, languages: any) {
+    setLanguages(context, languages) {
       context.commit("setLanguages", languages);
+    },
+    setResultBuffer(context, resultBuffer) {
+      context.commit("setResultBuffer", resultBuffer);
     },
     setConfig(context, config) {
       context.commit("setConfig", config);
     },
     updateConfig(context, config) {
       context.commit("updateConfig", config);
-    },
-    clearShared(context) {
-      context.commit("clearShared");
-    },
-    clearDiff(context) {
-      context.commit("clearDiff");
     },
   },
   modules: {},

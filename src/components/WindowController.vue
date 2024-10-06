@@ -3,33 +3,17 @@
 </template>
 
 <script lang="ts">
-import { ipcRenderer as ipc, webFrame } from "electron";
-import { RouteActionType, MenuActionType, Identifier } from "../common/types";
+import { RouteActionType } from "../common/types";
 import Vue from "vue";
-import Component, { mixins } from "vue-class-component";
-import bus from "../common/event-bus";
+import Component from "vue-class-component";
 
 @Component
 export default class WindowController extends Vue {
   routeName: RouteActionType | null = null;
+  //之所以不用window.innerHeight是因为他不会触发vue的响应式更新，所以我们只能监听resize事件然后手动更新
   windowHeight: number = window.innerHeight;
   windowWidth: number = window.innerWidth;
-
-  callback(...args: any[]) {
-    bus.at("dispatch", ...args);
-  }
-
-  close() {
-    this.callback("closeWindow");
-  }
-
-  minify() {
-    this.callback("hideWindow");
-  }
-
-  openMenu(id: MenuActionType) {
-    bus.iat("openMenu", id);
-  }
+  lastSync: number = 0;
 
   async onResize() {
     this.windowHeight = window.innerHeight;
@@ -38,6 +22,7 @@ export default class WindowController extends Vue {
 
   mounted() {
     window.addEventListener("resize", this.onResize);
+    this.onResize();
   }
 
   destroyed() {

@@ -28,13 +28,13 @@ export const defaultTokens = new Map<TranslatorType, any>([
       token: process.env.VUE_APP_CAIYUN_TOKEN as string,
     },
   ],
-  [
-    "tencent",
-    {
-      secretId: process.env.VUE_APP_TENCENT_APP_KEY as string,
-      secretKey: process.env.VUE_APP_TENCENT_APP_SECRET as string,
-    },
-  ],
+  // [
+  //   "tencent",
+  //   {
+  //     secretId: process.env.VUE_APP_TENCENT_APP_KEY as string,
+  //     secretKey: process.env.VUE_APP_TENCENT_APP_SECRET as string,
+  //   },
+  // ],
   [
     "baidu-domain",
     {
@@ -42,13 +42,13 @@ export const defaultTokens = new Map<TranslatorType, any>([
       appid: "",
     },
   ],
-  // [
-  //   "sogou",
-  //   {
-  //     pid: process.env.VUE_APP_SOGOU_PID as string,
-  //     key: process.env.VUE_APP_SOGOU_KEY as string,
-  //   },
-  // ],
+  [
+    "sogou",
+    {
+      pid: process.env.VUE_APP_SOGOU_PID as string,
+      key: process.env.VUE_APP_SOGOU_KEY as string,
+    },
+  ],
 ]);
 
 export function examToken(config: KeyConfig): boolean {

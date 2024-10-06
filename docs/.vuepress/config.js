@@ -5,6 +5,9 @@ module.exports = {
     ['link', {
       rel: 'icon',
       href: `/icon.png`
+    }],
+    ['script', {
+      src: '/marked.min.js',
     }]
   ],
   // base: '/docs/',
@@ -40,7 +43,7 @@ module.exports = {
       },
       {
         text: '更新日志',
-        link: '/changelogs/v9'
+        link: '/changelogs/'
       },
       {
         text: '用户生态',
@@ -61,6 +64,9 @@ module.exports = {
         collapsable: false,
         children: [
           '',
+          'windows',
+          'linux',
+          'mac',
         ]
       }],
       '/userland/': [{
@@ -81,7 +87,8 @@ module.exports = {
           '9.0.0',
           '8.4.0',
           '8.3.0',
-          'questions'
+          'tricks',
+          'questions',
         ]
       }],
       '/changelogs/': [{
